@@ -1,0 +1,37 @@
+# Android stuff
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+*.backup
+
+# Project stuff
+/flaticon-apikey
+/flaticon-token
+
+
+# Non-free images - do not add to repository!
+pkg_bottle.png
+pkg_crawl.png
+pkg_diaper.png
+pkg_no_notes.png
+pkg_no_poop.png
+pkg_not_wet.png
+pkg_notes.png
+pkg_poop.png
+pkg_sleep.png
+pkg_solid_food.png
+pkg_wet.png
+pkg_breast.png
+

@@ -1,0 +1,19 @@
+<resources>
+    <declare-styleable name="AppWidgetAttrs">
+        <attr name="appWidgetBackgroundColor" format="color" />
+        <attr name="appWidgetTextColor" format="color" />
+        <attr name="colorPopoverBackground" format="color" />
+        <attr name="colorPopoverTextColor" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="HorizontalNumberPicker">
+        <attr name="textSize" format="dimension" />
+        <attr name="zeroOnValues" format="boolean">true</attr>
+        <attr name="colorPrimary" format="color">"#000000"</attr>
+        <attr name="colorSecondary" format="color">"#202020"</attr>
+    </declare-styleable>
+
+    <declare-styleable name="InfoBubble">
+        <attr name="pillColor" format="color">"#FFFFFFFF"</attr>
+    </declare-styleable>
+</resources>

@@ -1,0 +1,141 @@
+import groovy.xml.MarkupBuilder
+
+import java.util.regex.Matcher
+
+plugins {
+    id 'com.android.application'
+}
+apply plugin: 'kotlin-android'
+
+task generateAboutStrings {
+    String attributionsText = new File("ATTRIBUTIONS.md").text
+    String[] sections = attributionsText.replaceAll("\n", " ").split("##")
+
+    def outList = []
+
+    for (String sec in sections[1..-1]) {
+        String title = sec.split("!\\[")[0]
+        Matcher tagsMatch = title =~ /.*\(([^)]+)\).*/
+        tagsMatch.find()
+        String tagsList = tagsMatch.group(1).replaceAll(" ", "")
+
+        Matcher addressMatch = sec =~ /(<a .*href.*>.*<\/a>)/
+        addressMatch.find()
+        String aHrefString = addressMatch.group(1)
+
+        Matcher aHrefTitleMatch = aHrefString =~ /<a [^>]*>([^<]+)<\/a>/
+        aHrefTitleMatch.find()
+        String aHrefTitle =  aHrefTitleMatch.group(1)
+
+        Matcher aHrefAddressMatch = aHrefString =~ /<a[^>]+href="([^"]+)"[^>]*>/
+        aHrefAddressMatch.find()
+        String aHrefAddress =  aHrefAddressMatch.group(1)
+
+        outList.add(["icons": tagsList, "title": aHrefTitle, "link": aHrefAddress])
+    }
+
+    String licenseText = new File("LICENSE.md").text.trim()
+    String[] splits = licenseText.split("\n", 2)
+    String licenseTitle = splits[0].replace("#", "").trim()
+    licenseText = splits[1].trim().replaceAll("\n\n", "\\\\\\n\\\\\\n").replaceAll("\n", " ")
+
+    def xmlout = new StringWriter()
+    def xml = new MarkupBuilder(xmlout)
+    xml.resources {
+        xml."string-array"(name:"autostring_about_icon_iconlists") {
+            for (item in outList) {
+                xml.item(item["icons"])
+            }
+        }
+        xml."string-array"(name:"autostring_about_icon_titles") {
+            for (item in outList) {
+                xml.item(item["title"])
+            }
+        }
+        xml."string-array"(name:"autostring_about_icon_links") {
+            for (item in outList) {
+                xml.item(item["link"])
+            }
+        }
+        xml.string(name:"autostring_about_license_title", "Licensed under ${licenseTitle}")
+        xml.string(name:"autostring_about_license_text", licenseText)
+    }
+
+    FileWriter about_strings_file_writer = new FileWriter("app/src/main/res/values/about_strings.xml")
+    about_strings_file_writer.write("<!-- Auto-generated file - do not edit! -->\n")
+    about_strings_file_writer.write(xmlout.getBuffer().toString())
+    about_strings_file_writer.close()
+}
+
+task invokeMakefile(type: Exec) {
+    commandLine 'make', '-C', '..', '-f', 'resources.makefile'
+}
+
+build {
+    dependsOn(generateAboutStrings)
+    dependsOn(invokeMakefile)
+}
+
+android {
+    compileSdkVersion 33
+
+    defaultConfig {
+        applicationId "eu.pkgsoftware.babybuddywidgets"
+        minSdkVersion 24
+        targetSdkVersion 33
+        versionCode 27
+        versionName "2.1.0b"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    buildFeatures {
+        viewBinding true
+    }
+    namespace 'eu.pkgsoftware.babybuddywidgets'
+}
+
+ext.camerax_version = "1.2.3"
+
+dependencies {
+    implementation 'com.squareup.phrase:phrase:1.2.0'
+
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.6.0'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.6.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation("androidx.concurrent:concurrent-futures:1.1.0")
+
+    implementation "androidx.camera:camera-core:$camerax_version"
+    implementation "androidx.camera:camera-camera2:$camerax_version"
+    implementation "androidx.camera:camera-lifecycle:$camerax_version"
+    implementation "androidx.camera:camera-view:$camerax_version"
+
+    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
+
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.json:json:20230618'
+
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    implementation project(':zxing-cpp')
+}
+repositories {
+    mavenCentral()
+}

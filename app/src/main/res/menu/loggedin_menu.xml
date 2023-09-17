@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="eu.pkgsoftware.babybuddywidgets.MainActivity">
+    <item
+        android:id="@+id/showHelpMenuButton"
+        android:title="@string/showHelpMenuButtonTitle" />
+    <item
+        android:id="@+id/logoutMenuButton"
+        android:icon="@android:drawable/ic_menu_revert"
+        android:title="@string/logoutMenu" />
+    <item
+        android:id="@+id/aboutPageMenuItem"
+        android:title="@string/about_page_title" />
+    <item
+        android:id="@+id/exportDebugLogsMenuItem"
+        android:title="@string/export_debug_logs_menu_item" />
+</menu>

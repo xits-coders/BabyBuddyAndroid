@@ -1,0 +1,3 @@
+[submodule "app/src/submodules/zxing-cpp"]
+	path = 3rdparty/zxing-cpp
+	url = https://github.com/zxing-cpp/zxing-cpp.git

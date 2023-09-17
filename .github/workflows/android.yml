@@ -1,0 +1,55 @@
+name: Build & Publish Release APK
+on:
+  push:
+    tags:
+      - '*'
+jobs:
+  Gradle:
+    runs-on: ubuntu-latest
+    steps:
+     - name: Checkout repositorys
+       uses: actions/checkout@v3
+       with:
+        submodules: recursive remote
+     - name: checkout code
+       uses: actions/checkout@v2
+     - name: setup jdk
+       uses: actions/setup-java@v1
+       with:
+        java-version: 17
+     - name: Pull remote git submodule
+       run: /usr/bin/git -c protocol.version=2 submodule update --init --force --depth=0 --recursive  --remote
+     - name: Make Gradle executable
+       run: chmod +x ./gradlew
+     - name: PreBuild Debug APK with scan only
+       run: ./gradlew assembleDebug --scan
+     - name: Build Debug APK
+       run: ./gradlew assembleDebug
+     - name: Rename Debug APK
+       run: mv app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/BabyBuddy_Debug.apk
+     - name: Build Release APK          
+       run: ./gradlew assembleRelease
+     - name: Rename Release APK
+       run: mv app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/apk/release/BabyBuddy.apk
+     - name: checkout debug dir
+       run: ls -al app/build/outputs/apk/debug
+     - name: checkout release dir
+       run: ls -al app/build/outputs/apk/release
+     - name: MD5 APK Debug
+       run: md5sum -b app/build/outputs/apk/debug/BabyBuddy_Debug.apk >> BabyBuddy_Debug.md5
+     - name: MD5 APK Release
+       run: md5sum -b app/build/outputs/apk/release/BabyBuddy.apk >> BabyBuddy.md5
+     - name: Get SHA
+       run: echo ${{ github.sha }} > ReleaseHash.txt
+     - name: Test
+       run: cat ReleaseHash.txt
+     - name: Release
+       uses: softprops/action-gh-release@v1
+       if: startsWith(github.ref, 'refs/tags/')
+       with:
+         files: |
+            app/build/outputs/apk/debug/BabyBuddy_Debug.apk
+            app/build/outputs/apk/release/BabyBuddy.apk
+            BabyBuddy_Debug.md5
+            BabyBuddy.md5
+            ReleaseHash.txt
